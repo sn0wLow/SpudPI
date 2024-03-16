@@ -1,0 +1,102 @@
+﻿@inject ILocalStorageService LocalStorage
+@inject IJSRuntime JSRuntime;
+
+
+<div class="memesound-icon-container  @Class"
+     style="@Style" aria-label="MemeSound Icon"
+     aria-disabled="@(IsPlayingMemeSound ? "true": "false")"
+     @onclick="IconClicked">
+    <div class="memesound-icon-content" style="--icon-size: @IconSize;">
+        <div class="memesound-icon">
+            <div class="memesound-image-container">
+                @if (Image is null)
+                {
+                    <img src="_content/SpudPI.BlazorClassLibrary/Resources/Images/memesound-icon.svg" alt="soundboard-icon">
+                }
+                else
+                {
+                    <img src="@($"data:image/png;base64,{Image}")" alt="soundboard-icon">
+                }
+            </div>
+
+            @if (ShowBadges && IsPro)
+            {
+                <div class="memesound-badge">
+                    <MudText Typo="Typo.caption"
+                             Style="background-color: var(--mud-palette-primary); color: white;
+                                    padding: 0.05rem 0.1rem; font-size: 0.6rem"
+                             Class="opacity-90 br-5 rounded">PRO</MudText>
+
+                </div>
+            }
+            else if (ShowBadges && IsCustom)
+            {
+                <div class="memesound-badge">
+                    <MudIcon Icon="@Icons.Material.Filled.Person"
+                             Color="Color.Surface"
+                             Size="MudBlazor.Size.Small" Class="opacity-90" />
+                </div>
+            }
+
+        </div>
+
+        @if (IsPlayingMemeSound)
+        {
+            <div class="playing-memesound-overlay">
+                <MudProgressCircular Size="Size.Medium" Indeterminate="true" />
+            </div>
+        }
+    </div>
+
+    <div>
+        <p class="meme-sound-name mt-2" style="width: calc(@IconSize  + 1.5rem)">
+            @Name
+        </p>
+    </div>
+</div>
+
+@code {
+    private Task IconClicked()
+    {
+        if (!IsPlayingMemeSound)
+        {
+            return OnIconClick.InvokeAsync(ID);
+        }
+
+        return Task.CompletedTask;
+    }
+
+
+    [Parameter]
+    public EventCallback<Guid> OnIconClick { get; set; }
+
+    [Parameter]
+    public string IconSize { get; set; } = "5.0rem";
+
+    [Parameter]
+    public string? Class { get; set; }
+
+    [Parameter]
+    public string? Style { get; set; }
+
+    [Parameter]
+    public string? Image { get; set; } = null;
+
+    [Parameter]
+    public bool IsPlayingMemeSound { get; set; } = false;
+
+    [Parameter]
+    public bool IsPro { get; set; } = false;
+
+    [Parameter]
+    public bool IsCustom { get; set; } = false;
+
+    [Parameter]
+    public bool ShowBadges { get; set; } = false;
+
+    [Parameter, EditorRequired]
+    public required Guid ID { get; init; }
+
+    [Parameter, EditorRequired]
+    public required string Name { get; init; }
+}

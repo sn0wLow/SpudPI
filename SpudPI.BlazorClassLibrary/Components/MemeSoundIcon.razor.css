@@ -1,0 +1,96 @@
+﻿.memesound-icon-container {
+    --icon-border-radius: 0.5rem;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+    .memesound-icon-container[aria-disabled="true"] .memesound-icon
+    {
+        opacity: 0.25 !important;
+    }
+
+
+    .memesound-icon-container[aria-disabled="false"]:hover .memesound-icon {
+        outline: 1px solid var(--mud-palette-primary) !important;
+        transform: scale(110%);
+    }
+
+.memesound-icon-content {
+    display: grid;
+    grid-template-columns: 1fr;
+    height: var(--icon-size);
+}
+
+.memesound-icon {
+    outline: 1px solid transparent !important;
+    border-radius: var(--icon-border-radius);
+    transition: outline 300ms, transform 300ms ease-in-out, opacity 1000ms ease-out;
+    background-color: black;
+    grid-row-start: 1;
+    grid-column-start: 1;
+    height: var(--icon-size);
+    min-height: var(--icon-size);
+    max-height: var(--icon-size);
+    width: var(--icon-size);
+    min-width: var(--icon-size);
+    max-width: var(--icon-size);
+}
+
+
+
+.memesound-image-container {
+    grid-row-start: 1;
+    grid-column-start: 1;
+    overflow: hidden;
+    border-radius: var(--icon-border-radius);
+}
+
+.memesound-icon img {
+    height: var(--icon-size);
+    min-height: var(--icon-size);
+    max-height: var(--icon-size);
+    width: var(--icon-size);
+    min-width: var(--icon-size);
+    max-width: var(--icon-size);
+    pointer-events: none;
+    -webkit-user-drag: none;
+    user-select: none;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+}
+
+
+.meme-sound-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    word-break: normal;
+    overflow-wrap: break-word;
+    font-weight: bold;
+    text-align: center;
+}
+
+.memesound-badge {
+    pointer-events: none;
+    position: relative;
+    bottom: calc(var(--icon-size) / 6);
+    left: calc(var(--icon-size) * 0.8);
+    z-index: 1;
+}
+
+.playing-memesound-overlay {
+    grid-row-start: 1;
+    grid-column-start: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: var(--icon-size);
+    height: var(--icon-size);
+    border-radius: inherit;
+    position: relative;
+}

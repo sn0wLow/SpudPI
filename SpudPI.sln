@@ -1,0 +1,55 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.9.34414.90
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpudPI.API", "SpudPI.API\SpudPI.API.csproj", "{67FB8B67-0985-4C46-9F88-3B7420B01E72}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VoicemodAPI", "VoicemodAPI\VoicemodAPI.csproj", "{5B41C3C8-064B-4FC0-A279-B91D3CDB6017}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpudPI.Shared", "SpudPI.Shared\SpudPI.Shared.csproj", "{0DBADC78-74DE-4DD8-B61D-AC34C4BB0027}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpudPI.BlazorClassLibrary", "SpudPI.BlazorClassLibrary\SpudPI.BlazorClassLibrary.csproj", "{392E0029-3D6E-4730-B936-E73B0BFE9F9D}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpudPI.Web.Client", "SpudPI.Web.Client\SpudPI.Web.Client.csproj", "{CE7FC7F7-0852-40B4-BFBD-3571DB04C857}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpudPI.WPF.Client", "SpudPI.WPF.Client\SpudPI.WPF.Client.csproj", "{B087C1FC-CE1D-4366-B2D9-FBB080353543}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{67FB8B67-0985-4C46-9F88-3B7420B01E72}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{67FB8B67-0985-4C46-9F88-3B7420B01E72}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{67FB8B67-0985-4C46-9F88-3B7420B01E72}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{67FB8B67-0985-4C46-9F88-3B7420B01E72}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5B41C3C8-064B-4FC0-A279-B91D3CDB6017}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5B41C3C8-064B-4FC0-A279-B91D3CDB6017}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5B41C3C8-064B-4FC0-A279-B91D3CDB6017}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5B41C3C8-064B-4FC0-A279-B91D3CDB6017}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0DBADC78-74DE-4DD8-B61D-AC34C4BB0027}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0DBADC78-74DE-4DD8-B61D-AC34C4BB0027}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0DBADC78-74DE-4DD8-B61D-AC34C4BB0027}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0DBADC78-74DE-4DD8-B61D-AC34C4BB0027}.Release|Any CPU.Build.0 = Release|Any CPU
+		{392E0029-3D6E-4730-B936-E73B0BFE9F9D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{392E0029-3D6E-4730-B936-E73B0BFE9F9D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{392E0029-3D6E-4730-B936-E73B0BFE9F9D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{392E0029-3D6E-4730-B936-E73B0BFE9F9D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CE7FC7F7-0852-40B4-BFBD-3571DB04C857}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CE7FC7F7-0852-40B4-BFBD-3571DB04C857}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CE7FC7F7-0852-40B4-BFBD-3571DB04C857}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CE7FC7F7-0852-40B4-BFBD-3571DB04C857}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B087C1FC-CE1D-4366-B2D9-FBB080353543}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B087C1FC-CE1D-4366-B2D9-FBB080353543}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B087C1FC-CE1D-4366-B2D9-FBB080353543}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B087C1FC-CE1D-4366-B2D9-FBB080353543}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {A664F5AD-226B-4957-B21E-8C38361A9CE7}
+	EndGlobalSection
+EndGlobal

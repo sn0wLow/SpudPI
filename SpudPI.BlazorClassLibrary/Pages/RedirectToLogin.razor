@@ -1,0 +1,13 @@
+﻿@inject NavigationManager NavigationManager
+@code {
+    protected override void OnInitialized()
+    {
+        var uri = new Uri(NavigationManager.Uri);
+        // Check if we're not already on the login page to avoid unnecessary navigation
+        if (!uri.AbsolutePath.EndsWith("/login", StringComparison.OrdinalIgnoreCase))
+        {
+            // Navigate without forcing a refresh
+            NavigationManager.NavigateTo("/login", false);
+        }
+    }
+}

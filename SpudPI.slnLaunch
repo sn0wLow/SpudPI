@@ -1,0 +1,17 @@
+[
+  {
+    "Name": "API",
+    "Projects": [
+      {
+        "Name": "SpudPI.API\\SpudPI.API.csproj",
+        "Action": "Start",
+        "DebugTarget": ""
+      },
+      {
+        "Name": "SpudPI.Web.Client\\SpudPI.Web.Client.csproj",
+        "Action": "Start",
+        "DebugTarget": ""
+      }
+    ]
+  }
+]

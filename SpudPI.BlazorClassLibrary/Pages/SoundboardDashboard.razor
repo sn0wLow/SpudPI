@@ -1,0 +1,427 @@
+﻿@page "/soundboard"
+@inject IVoicemodService VoicemodService
+@inject ISnackbar Snackbar
+@inject IMSBStorageService MSBStorageService;
+@attribute [Authorize]
+
+<PageTitle>Soundboard Dashboard</PageTitle>
+
+@if(isLoading)
+{
+    <MudStack Spacing="3" AlignItems="AlignItems.Start">
+        <MudSkeleton SkeletonType="SkeletonType.Rectangle"  Style="margin-top: 6px" Width="100%" Height="56px"/>
+            <div class="d-flex justify-content-between w-100">
+                <div class="d-flex align-items-center">
+                    <MudSkeleton SkeletonType="SkeletonType.Rectangle"  Style="margin-right: 20px" Width="130px" Height="38px"/>
+                    <MudSkeleton SkeletonType="SkeletonType.Rectangle" Width="230px" Height="38px"/>
+                </div>
+            </div>
+
+            <MudSkeleton SkeletonType="SkeletonType.Rectangle" Width="80%" Height="3.5rem"/>
+
+
+            <div class="memesounds-icon-container">
+                @for (int i = 0; i < 32; i++)
+                {
+                    <MudSkeleton SkeletonType="SkeletonType.Rectangle" 
+                    Style="margin-bottom: 2rem; border-radius: 0.75rem" 
+                    Width="5rem" Height="5rem"/>
+                }
+            </div>
+    </MudStack>
+    return;
+}
+
+@if(sbResult is not null && !sbResult.Success)
+{
+    <MudText Typo="Typo.h4">@sbResult.Message</MudText>
+    return;
+}
+
+<MudStack Spacing="3" AlignItems="AlignItems.Start">
+    <MudAutocomplete T="string" Label="Search Sounds" FullWidth="true"
+                     AdornmentIcon="@Icons.Material.Filled.Search" AdornmentColor="Color.Info"
+                     CloseIcon="true" Variant="Variant.Filled" Clearable="true"
+                     ResetValueOnEmptyText="false" CoerceText="false" CoerceValue="true"
+                     SearchFunc="@SearchSounds" @bind-Value="searchSoundValue"
+                     DebounceInterval="200"/>
+
+    @if(string.IsNullOrEmpty(searchSoundValue))
+    {
+       <div class="d-flex justify-content-between w-100">
+            <div class="d-flex align-items-center">
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="mr-5 h-100" 
+                    Disabled="@isStoppingAllSounds" OnClick="StopAllSounds">
+                    @if (updateStoppingAllSoundsBtn)
+                    {
+                        <MudText>Stopping all Sounds</MudText>
+                        <MudProgressCircular Class="ms-2" Size="Size.Small" Indeterminate="true" />
+                    }
+                    else
+                    {
+                        <MudText>Stop all Sounds</MudText>
+                    }
+                </MudButton>
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="mr-5 h-100"
+                    Disabled="@(isSynchronizingImages)" 
+                    OnClick="SynchronizeMemeSoundImages">
+
+                    @if (isSynchronizingImages)
+                    {
+                        <MudText>Synchronizing Sound Icons</MudText>
+                        <MudProgressCircular Class="ms-2" Size="Size.Small" Indeterminate="true" />
+                    }
+                    else
+                    {
+                        <MudText>Synchronize Sound Icons</MudText>
+                    }                
+                </MudButton>
+            </div>
+
+            <div class="d-flex align-items-center">
+                @if(muteMemeForMe is null)
+                {
+                    <MudTooltip Text="Mute Meme Sounds for me Status unavailable" Arrow="true" Placement="Placement.Bottom">
+                        <MudSwitch T="bool" Disabled="true" Label="Mute MemeSound for me" Color="Color.Info"/>
+                    </MudTooltip>
+                }
+                else
+                {
+                    <MudTooltip>
+                        <MudSwitch T="bool?" Label="Mute Meme Sounds for me" 
+                            Color="Color.Info" @bind-Value="muteMemeForMe"
+                            Disabled="@isTogglingMuteForMe"
+                            @onclick="ToggleMuteMemeSoundForMe"/>
+                    </MudTooltip>
+                }
+
+                <MudIconButton Icon="@Icons.Material.Filled.Square" Size="Size.Small" />
+                <MudIconButton Icon="@Icons.Material.Filled.ViewAgenda" Size="Size.Small" />
+                <MudIconButton Icon="@Icons.Material.Filled.FormatListBulleted" Size="Size.Small" />
+            </div>
+        </div>
+
+        <SoundboardPanel Soundboards="@soundboards"
+                         SelectedSoundboardGuid="@selectedSoundboardGuid"
+                         SelectedSoundboardGuidChanged="@((guid) => selectedSoundboardGuid = guid)" />
+
+        <div class="memesounds-icon-container">
+            @{
+                if (selectedSoundboardGuid is not null)
+                {
+                    var selectedSoundboardSounds = new List<Sound>();
+
+                    if (!string.IsNullOrEmpty(searchSoundValue))
+                    {
+                        selectedSoundboardSounds = soundboards.Find(x => x.ID.Equals(selectedSoundboardGuid))?.Sounds?
+                        .Where(x => x.Name is not null)
+                        .Where(x => x.Name!.Contains(searchSoundValue, StringComparison.InvariantCultureIgnoreCase)).ToList();
+                    }
+                    else
+                    {
+                        selectedSoundboardSounds = soundboards.Find(x => x.ID.Equals(selectedSoundboardGuid))?.Sounds?
+                        .Where(x => x.Name is not null).ToList();
+                    }
+
+                    if (selectedSoundboardSounds is not null)
+                    {
+                        foreach (var sound in selectedSoundboardSounds)
+                        {
+                            <MemeSoundIcon ID="@sound.ID" Name="@sound.Name" 
+                            Image="@sound.Image" IsPlayingMemeSound="@sound.IsPlayingMemeSound" 
+                            OnIconClick="@((id) => PlayMemeSound(id))"/>
+                        }
+                    }
+                }
+
+            }
+        </div>
+    }
+    else
+    {
+        <div class="w-100 h-100">
+            <MudPaper Class="d-flex flex-column p-3">
+                <div class="d-flex">
+                    <MudText Typo="Typo.h5" Class="me-5">Search Results</MudText>
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="mr-5 h-100" 
+                        Disabled="@isStoppingAllSounds" OnClick="StopAllSounds">
+                        @if (updateStoppingAllSoundsBtn)
+                        {
+                            <MudText>Stopping all Sounds</MudText>
+                            <MudProgressCircular Class="ms-2" Size="Size.Small" Indeterminate="true" />
+                        }
+                        else
+                        {
+                            <MudText>Stop all Sounds</MudText>
+                        }
+                    </MudButton>
+                </div>
+
+                <div class="memesounds-icon-search-container">
+
+                    @{
+                        var selectedSoundboardSounds = soundboards
+                                 .Where(x => x.Sounds is not null)
+                                 .SelectMany(x => x.Sounds!)
+                                 .Where(x => x.Name is not null)
+                                 .Where(x => x.Name!.Contains(searchSoundValue, StringComparison.InvariantCultureIgnoreCase))
+                                 .OrderBy(x => x.Name)
+                                 .OrderBy(x => x.ShowProLogo)
+                                 .ToList();
+
+                        if (selectedSoundboardSounds.Any())
+                        {
+                            foreach (var sound in selectedSoundboardSounds)
+                            {
+                                <MemeSoundIcon ID="@sound.ID" Name="@sound.Name" 
+                                IsPro="@(sound.ShowProLogo ?? false)" 
+                                IsCustom="@(sound.IsCustom ?? false)" 
+                                ShowBadges="true"
+                                Image="@sound.Image" IsPlayingMemeSound="@sound.IsPlayingMemeSound" 
+                                OnIconClick="@((id) => PlayMemeSound(id))"/>
+                            }
+                        }
+                        else
+                        {
+                            <div class="w-100">
+                                <MudText Typo="Typo.body1" Align="Align.Center">No results match your search</MudText>
+                            </div>
+                        }
+
+
+                    }
+                </div>
+
+            </MudPaper>
+        </div>
+
+    }
+
+</MudStack>
+
+
+
+@code {
+    private bool isLoading = true;
+    private ServiceResponse<List<Soundboard>> sbResult = null!;
+    private bool isStoppingAllSounds = false;
+    private bool updateStoppingAllSoundsBtn = false;
+    private List<Soundboard> soundboards = new List<Soundboard>();
+
+    private bool? muteMemeForMe;
+
+    private HashSet<string> soundboardNames = new();
+    private Dictionary<Guid, MemeSoundBitmap> guidMemeSoundBitmapMap = new();
+    private Dictionary<Guid, Sound> guidSoundMap = new();
+
+    private Guid? selectedSoundboardGuid = null;
+    private string? searchSoundValue = null;
+
+    private bool isSynchronizingImages = false;
+    private bool isTogglingMuteForMe = false;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        sbResult = await VoicemodService.GetAllSoundboards();
+
+        if (sbResult.Success && sbResult.Data is not null)
+        {
+            soundboards = sbResult.Data.OrderBy(x => x.ShowProLogo).ToList();
+
+            foreach (var soundboard in soundboards)
+            {
+                foreach (var sound in soundboard.Sounds!)
+                {
+
+                    if (sound.Name is not null)
+                    {
+                        soundboardNames.Add(sound.Name);
+                    }
+
+                    var memeSoundBitmap = new MemeSoundBitmap()
+                    { 
+                        MemeID = sound.ID, 
+                        ImageBase64 = sound.Image 
+                    };
+
+
+                    guidMemeSoundBitmapMap.Add(sound.ID, memeSoundBitmap);
+                    guidSoundMap.Add(sound.ID, sound);
+                }
+            }
+
+            var keys = soundboards
+                .SelectMany(sb => sb.Sounds!)
+                .Select(s => s.ID)
+                .ToList();
+
+            var memeSoundBitmaps = await LoadBitmaps(keys);
+
+            foreach (var bitmap in memeSoundBitmaps)
+            {
+                if (guidSoundMap.ContainsKey(bitmap.MemeID))
+                {
+                    guidSoundMap[bitmap.MemeID].Image = bitmap.ImageBase64;
+                }
+            }
+
+
+        }
+
+        var muteForMeResponse = await VoicemodService.GetMuteMemeForMeStatus();
+
+        if (muteForMeResponse.Success)
+        {
+            muteMemeForMe = muteForMeResponse.Data;
+        }
+
+        isLoading = false;
+        StateHasChanged();
+    }
+
+    private async Task ToggleMuteMemeSoundForMe()
+    {
+        isTogglingMuteForMe = true;
+        StateHasChanged();
+
+        var GetToggleMuteMemeForMeResponse = await VoicemodService.GetToggleMuteMemeForMe();
+
+        if (GetToggleMuteMemeForMeResponse.Success)
+        {
+            muteMemeForMe = GetToggleMuteMemeForMeResponse.Data;
+        }
+        else
+        {
+            muteMemeForMe = null;
+        }
+
+        isTogglingMuteForMe = false;
+        StateHasChanged();
+    }
+
+    private async Task<IEnumerable<string>> SearchSounds(string value)
+    {
+        if (selectedSoundboardGuid is null)
+        {
+            return Enumerable.Empty<string>();
+        }
+
+        // if text is null or empty, show complete list
+        if (string.IsNullOrEmpty(value))
+        {
+            return soundboardNames;
+        }
+
+        await Task.Delay(0);
+
+        return soundboardNames.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+    }
+
+    private async Task PlayMemeSound(Guid id)
+    {
+        guidSoundMap[id].IsPlayingMemeSound = true;
+        StateHasChanged();
+
+        var result = await VoicemodService.PlayMemeSound(id);
+
+        if (!result.Success)
+        {
+            Snackbar.Add($"Error Playing MemeSound: {result.Message}", Severity.Error);
+        }
+
+        guidSoundMap[id].IsPlayingMemeSound = false;
+        StateHasChanged();
+    }
+
+    private async Task StopAllSounds()
+    {
+        isStoppingAllSounds = true;
+        StateHasChanged();
+
+        var delayTask = Task.Delay(250);
+        var stopSoundsTask = VoicemodService.StopAllMemeSounds();
+
+        var firstTask = await Task.WhenAny(delayTask, stopSoundsTask);
+
+        if (firstTask == delayTask && !stopSoundsTask.IsCompleted)
+        {
+            updateStoppingAllSoundsBtn = true;
+            StateHasChanged();
+        }
+
+        try
+        {
+            var result = await stopSoundsTask;
+            if (!result.Success)
+            {
+                Snackbar.Add($"Error Stopping all MemeSounds: {result.Message}", Severity.Error);
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error Stopping all MemeSounds: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            updateStoppingAllSoundsBtn = false;
+            isStoppingAllSounds = false;
+            StateHasChanged();
+        }
+    }
+
+    private async void SynchronizeMemeSoundImages()
+    {
+        isSynchronizingImages = true;
+        StateHasChanged();
+
+        var result = await VoicemodService.GetAllMemeSoundBitmaps();
+
+        if (result.Success && result.Data is not null)
+        {
+            foreach (var bitmap in result.Data)
+            {
+                if (guidSoundMap.ContainsKey(bitmap.MemeID))
+                {
+                    guidSoundMap[bitmap.MemeID].Image = bitmap.ImageBase64;
+                }
+
+                if (guidMemeSoundBitmapMap.ContainsKey(bitmap.MemeID))
+                {
+                    guidMemeSoundBitmapMap[bitmap.MemeID].ImageBase64 = bitmap.ImageBase64;
+                }
+            }
+
+            await SaveBitmaps();
+        }
+
+
+        isSynchronizingImages = false;
+        StateHasChanged();
+    }
+
+    private async Task<IEnumerable<MemeSoundBitmap>> LoadBitmaps(IEnumerable<Guid> keys)
+    {
+        try
+        {
+            return await MSBStorageService.LoadBitmapsAsync(keys);
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error Loading Images: {ex}", Severity.Error);
+            return new List<MemeSoundBitmap>();
+        }
+    }
+
+    private async Task SaveBitmaps()
+    {
+        try
+        {
+            await MSBStorageService.SaveBitmapsAsync(new HashSet<MemeSoundBitmap>(guidMemeSoundBitmapMap.Values));
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error Saving Images: {ex}", Severity.Error);
+        }
+    }
+}

@@ -1,0 +1,116 @@
+﻿@page "/login"
+@inject IAuthService AuthService
+@inject ILocalStorageService LocalStorage
+@inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+
+<PageTitle>Login</PageTitle>
+<MudGrid Justify="Justify.Center" Style="height: 80%; align-items: center">
+    <MudItem xs="12" sm="8" md="6" xl="4">
+        <EditForm Model="@loginDTO" OnValidSubmit="OnValidSubmit">
+            <DataAnnotationsValidator />
+
+
+            <MudCard Elevation="5">
+                <MudCardContent>
+                    <MudText Typo="Typo.h3" Align="Align.Center">SpudPI Login</MudText>
+                    @if (!success && showErrorAlert)
+                    {
+                        <MudAlert Severity="Severity.Error"
+                                  Variant="Variant.Filled"
+                                  Class="mt-5 mb-5" ShowCloseIcon="true"
+                                  CloseIconClicked="@(() => showErrorAlert = false)">@errorMessage</MudAlert>
+                    }
+
+                    <MudTextField Label="Passwort" Class="mt-3" MaxLength="100"
+                                  @bind-Value="loginDTO.Password" For="@(() => loginDTO.Password)" InputType="@inputType"
+                                  Adornment="Adornment.End" 
+                                  AdornmentIcon="@passwordInputIcon" OnAdornmentClick="TogglePasswordVisibility"
+                                  AdornmentAriaLabel="Show Password" />
+                </MudCardContent>
+                <MudCardActions>
+
+                    <MudButton ButtonType="ButtonType.Submit" Disabled="@processing" Variant="Variant.Filled" Color="Color.Primary" Class="mx-auto">
+                        @if (processing)
+                        {
+                            <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
+                            <MudText Class="ms-2">Processing</MudText>
+                        }
+                        else
+                        {
+                            <MudText>Login</MudText>
+                        }
+                    </MudButton>
+
+                </MudCardActions>
+            </MudCard>
+
+        </EditForm>
+    </MudItem>
+</MudGrid>
+
+@code {
+    private LoginDTO loginDTO = new LoginDTO();
+    private string errorMessage = string.Empty;
+    private bool success = true;
+    private bool showErrorAlert = true;
+    private bool processing = false;
+
+    private bool hidePassword = true;
+    private InputType inputType = InputType.Password;
+    private string passwordInputIcon = Icons.Material.Filled.Visibility;
+
+    private async Task OnValidSubmit(EditContext context)
+    {
+        if (processing)
+        {
+            return;
+        }
+
+        processing = true;
+
+        var result = await AuthService.Login(loginDTO);
+
+        if (result.Success)
+        {
+            errorMessage = string.Empty;
+            showErrorAlert = false;
+            success = true;
+
+            await LocalStorage.SetItemAsync("authToken", result.Data);
+            await AuthenticationStateProvider.GetAuthenticationStateAsync();
+            //NavigationManager.NavigateTo("/", false);
+            StateHasChanged();
+        }
+        else
+        {
+            errorMessage = result.Message;
+            success = false;
+            showErrorAlert = true;
+        }
+
+
+
+        processing = false;
+    }
+
+
+
+    private void TogglePasswordVisibility()
+    {
+        hidePassword = !hidePassword;
+
+        @if (hidePassword)
+        {
+            passwordInputIcon = Icons.Material.Filled.Visibility;
+            inputType = InputType.Password;
+        }
+        else
+        {
+            passwordInputIcon = Icons.Material.Filled.VisibilityOff;
+            inputType = InputType.Text;
+
+        }
+    }
+}

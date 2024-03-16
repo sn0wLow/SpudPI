@@ -1,0 +1,66 @@
+﻿<MudTooltip Text="@Name" Arrow="true" Placement="Placement.Bottom">
+    <div class="soundboard-icon-container d-flex"
+         aria-label="Soundboard Icon" aria-selected="@(IsSelected ? "true": "false")"
+         @onclick="IconClicked">
+        <div class="soundboard-icon" style="--size: @Size;">
+            <img src="_content/SpudPI.BlazorClassLibrary/Resources/Images/soundboard-icon.svg" alt="soundboard-icon">
+
+            @if (IsPro)
+            {
+                <div class="h-100 w-100 me-5 mt-1 position-absolute top-100 start-100 translate-middle">
+                    <MudText Typo="Typo.caption"
+                             Style="background-color: var(--mud-palette-primary); color: white;
+                                    padding: 0.05rem 0.1rem; font-size: 0.6rem"
+                             Class="opacity-90 br-5 rounded">PRO</MudText>
+
+                </div>
+            }
+            else if (IsCustom)
+            {
+                <div class="h-100 w-100 ms-1 mt-1 position-absolute top-100 start-100 translate-middle">
+                    <MudIcon Icon="@Icons.Material.Filled.Person"
+                             Color="Color.Surface"
+                             Size="MudBlazor.Size.Small" Class="opacity-90" />
+                </div>
+            }
+        </div>
+
+        @if (IsSelected)
+        {
+            <div class="selected-bar"></div>
+        }
+    </div>
+</MudTooltip>
+
+
+@code {
+    private Task IconClicked() => OnIconClick.InvokeAsync(ID);
+
+    [Parameter]
+    public EventCallback<Guid> OnIconClick { get; set; }
+
+    // [Parameter]
+    // public string ImageSource { get; set; }
+
+    [Parameter]
+    public string Size { get; set; } = "3.5rem";
+
+    [Parameter]
+    public string Padding { get; set; } = "0.75rem";
+
+    [Parameter]
+    public bool IsSelected { get; set; } = false;
+
+    [Parameter, EditorRequired]
+    public required Guid ID { get; init; }
+
+    [Parameter]
+    public string? Name { get; set; }
+
+    [Parameter]
+    public bool IsCustom { get; set; } = false;
+
+    [Parameter]
+    public bool IsPro { get; set; } = false;
+
+}

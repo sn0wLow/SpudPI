@@ -1,0 +1,24 @@
+﻿@inject NavigationManager NavigationManager
+@inject ISnackbar Snackbar
+
+<MudNavMenu  Margin="Margin.Normal" Color="Color.Primary" Bordered="true">
+    <div>
+        <MudPaper Elevation="5" Class="navbar-header d-flex align-items-center">
+            <MudIconButton Icon="@Icons.Material.Filled.Close" Edge="Edge.Start" Color="Color.Inherit" OnClick="@((e) => ToggleDrawer())" />
+            <MudText Typo="Typo.h6" Class="px-4">SpudPI</MudText>
+        </MudPaper>
+    </div>
+    <div class="pt-2">
+        <MudNavLink Match="NavLinkMatch.All" Href="/" Icon="@Icons.Material.Filled.Home">Home</MudNavLink>
+        <MudNavLink Match="NavLinkMatch.All" Href="/soundboard" Icon="@Icons.Material.Filled.Dashboard">Soundboard</MudNavLink>
+    </div>
+</MudNavMenu>
+
+@code {
+    public event Action? ToggledDrawer;
+
+    private void ToggleDrawer()
+    {
+        ToggledDrawer?.Invoke();
+    }
+}

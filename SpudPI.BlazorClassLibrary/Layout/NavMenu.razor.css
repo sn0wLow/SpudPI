@@ -1,0 +1,7 @@
+::deep .navbar-header {
+    height: calc(var(--mud-appbar-height) - var(--mud-appbar-height)/4);
+    background-color: var(--mud-palette-info) !important;
+    border-radius: 0px;
+    color: var(--mud-palette-info-text) !important;
+    padding-left: 24px;
+}

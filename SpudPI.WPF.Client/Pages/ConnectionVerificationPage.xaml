@@ -1,0 +1,83 @@
+﻿<Page x:Class="SpudPI.WPF.Client.ConnectionVerificationPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      d:DesignHeight="450" d:DesignWidth="800"
+      mc:Ignorable="d" 
+      Title="ConnectionVerificationPage" Background="#FF1A1A1A" Foreground="LightGray" 
+      FontSize="16" FocusManager.FocusedElement="{Binding ElementName=txtBoxBaseAddress}">
+
+    <Grid>
+        <Grid x:Name="loginCheck">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="2*" MinWidth="280" MaxWidth="880"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <StackPanel Grid.Column="1" MinHeight="320" VerticalAlignment="Center">
+
+                <Viewbox StretchDirection="DownOnly" Margin="0 0 0 10">
+                    <TextBlock Text="Spud PI" FontSize="72" FontWeight="Bold"/>
+                </Viewbox>
+                <Border Background="LightGray" Height="4" Margin="0 0 0 10"/>
+
+
+                <Grid x:Name="gridSetUpForm" Grid.Row="1">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <GroupBox Grid.Row="0" Header="Protocol" Margin="0 0 0 10" BorderThickness="1" BorderBrush="Transparent">
+                        <StackPanel x:Name="groupProtocol" Orientation="Horizontal" Margin="5">
+                            <RadioButton GroupName="groupProtocol" IsChecked="True" Content="HTTP" Margin="0 0 10 0" Foreground="LightGray" FontWeight="Bold" Tag="http"/>
+                            <RadioButton GroupName="groupProtocol" Content="HTTPS" Foreground="LightGray" FontWeight="Bold" Tag="https" IsEnabled="False" Opacity="0.5"/>
+                        </StackPanel>
+                    </GroupBox>
+
+                    <Grid Grid.Row="1" Margin="0 0 5 15">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="4*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Grid Grid.Column="0" Margin="0 0 10 0">
+                            <StackPanel >
+                                <TextBlock  Text="Host Name or IP-Address" FontWeight="Bold"/>
+                                <TextBox x:Name="txtBoxBaseAddress" TextChanged="BaseAddress_TextChanged" Focusable="True"/>
+                            </StackPanel>
+                        </Grid>
+
+                        <Grid Grid.Column="1">
+                            <StackPanel>
+                                <TextBlock  Text="Port" FontWeight="Bold"/>
+                                <TextBox x:Name="txtBoxBaseAddressPort" MaxLength="5" PreviewTextInput="PreviewTextInputPort" TextChanged="BaseAddress_TextChanged"/>
+                            </StackPanel>
+                        </Grid>
+
+
+                    </Grid>
+
+                    <Grid Grid.Row="2" MaxWidth="350">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Button x:Name="btnTestAddress" Grid.Column="0" IsDefault="True" IsEnabled="True" Content="Test Connection" Margin="0 0 5 0" VerticalAlignment="Top" Click="BtnTestAddress_Click"/>
+                        <Button x:Name="btnStartSoundboard" Grid.Column="1" IsEnabled="False" Content="Start Soundboard" Margin="5 0 0 0" Click="BtnStartSoundboard_Click"/>
+                    </Grid>
+
+
+
+                </Grid>
+            </StackPanel>
+
+
+
+        </Grid>
+    </Grid>
+</Page>

@@ -1,0 +1,177 @@
+﻿@inherits LayoutComponentBase
+@inject ILocalStorageService LocalStorage
+@inject IPlatformService PlatformService
+@inject IWPFNavigationService WPFNavigationService
+@inject ISnackbar Snackbar
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
+
+
+
+<MudThemeProvider @ref="@mudThemeProvider" Theme="@theme" @bind-IsDarkMode="@isDarkMode" />
+<MudDialogProvider FullWidth="true"
+                   MaxWidth="MaxWidth.ExtraSmall"
+                   CloseButton="true"
+                   DisableBackdropClick="true"
+                   NoHeader="false"
+                   Position="DialogPosition.Center"
+                   CloseOnEscapeKey="true" />
+<MudSnackbarProvider />
+
+
+<div>
+    <MudLayout >
+        <AuthorizeView>
+            <MudAppBar Color="Color.Primary" Elevation="5" Fixed="true" Dense="true" Class="fade-in">
+                <MudIconButton Icon="@Icons.Material.Filled.Menu" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" Class="mudblazor-text-info" />
+                <MudText Typo="Typo.h6" Class="px-4">SpudPI</MudText>
+                <MudSpacer />
+
+                <div class="d-flex justify-items-center">
+                    @if (PlatformService.CurrentPlatform == Platform.WPF)
+                    {
+                        <div class="me-3">
+                            <MudTooltip Text="Switch back to SpudPI Connection Page" Arrow="true" Placement="Placement.Bottom" Class="me-3">
+                                <MudIconButton Icon="@Icons.Material.Filled.Web"
+                                               Class="mud-btn-background mudblazor-text-info"
+                                               OnClick="() => WPFNavigationService.NavigateToConnectionVerificationPage()" />
+                            </MudTooltip>
+                        </div>
+
+                    }
+                    <div class="me-3">
+                        <MudTooltip Text="Sign Out" Arrow="true" Placement="Placement.Bottom">
+                            <MudIconButton Icon="@Icons.Material.Filled.Logout"
+                                           Class="mud-btn-background mudblazor-text-info"
+                                           OnClick="() => LogOut()" />
+                        </MudTooltip>
+                    </div>
+                    <MudToggleIconButton Icon="@Icons.Material.Filled.DarkMode" Color="Color.Surface"
+                                         ToggledIcon="@Icons.Material.Filled.WbSunny" ToggledColor="Color.Warning"
+                                         aria-label="toggle-darkmode" Class="mud-btn-background"
+                                         @onclick="(e) => ToggleDarkMode()" Toggled="@isDarkMode" />
+                </div>
+
+
+            </MudAppBar>
+            <MudDrawer @bind-Open="@_drawerOpen" ClipMode="DrawerClipMode.Never" Variant="@DrawerVariant.Temporary" Width="256px" Elevation="5">
+                <NavMenu @ref="@navMenu" />
+            </MudDrawer>
+        </AuthorizeView>
+        <MudMainContent Class="mud-main-content" >
+            @Body
+        </MudMainContent>
+    </MudLayout>
+</div>
+
+
+@*<MudLayout>
+    <div class="page">
+        <div class="sidebar">
+            <AuthorizeView>
+                <NavMenu @ref="@navMenu" />
+            </AuthorizeView>
+        </div>
+        <main>
+            <article class="content px-4">
+                @Body
+            </article>
+        </main>
+
+    </div>
+</MudLayout>*@
+
+
+
+
+
+
+@*
+<MudThemeManagerButton OnClick="@((e) => OpenThemeManager(true))" />
+<MudThemeManager Open="_themeManagerOpen" OpenChanged="OpenThemeManager" Theme="_themeManager" ThemeChanged="UpdateTheme" />
+*@
+
+
+@code {
+    private MudThemeProvider? mudThemeProvider;
+    private NavMenu? navMenu;
+    private bool isDarkMode;
+
+    bool _drawerOpen = false;
+
+    private void DrawerToggle()
+    {
+        _drawerOpen = !_drawerOpen;
+    }
+
+    private async Task ToggleDarkMode()
+    {
+        isDarkMode = !isDarkMode;
+        await LocalStorage.SetItemAsync("UseDarkMode", isDarkMode);
+    }
+
+    private async Task LogOut()
+    {
+        await LocalStorage.RemoveItemAsync("authToken");
+        await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        NavigationManager.NavigateTo("/", false);
+        Snackbar.Add("Signed out successfully", Severity.Info);
+    }
+
+    private MudTheme theme = new MudTheme()
+        {
+            Palette = new PaletteLight()
+            {
+                Primary = Colors.Blue.Default
+
+            },
+            PaletteDark = new PaletteDark()
+            {
+                Primary = Colors.Blue.Default
+            }
+        };
+
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            bool? useDarkMode = null;
+            try
+            {
+                isDarkMode = await mudThemeProvider!.GetSystemPreference();
+                useDarkMode = await LocalStorage.GetItemAsync<bool?>("UseDarkMode");
+            }
+            catch (Exception)
+            {
+
+                useDarkMode = null;
+            }
+
+
+            if (useDarkMode is null)
+            {
+                isDarkMode = await mudThemeProvider!.GetSystemPreference();
+                await LocalStorage.SetItemAsync("UseDarkMode", isDarkMode);
+            }
+            else
+            {
+                isDarkMode = (bool)useDarkMode;
+            }
+
+            if (navMenu is not null)
+            {
+                navMenu!.ToggledDrawer += () =>
+                {
+                    _drawerOpen = !_drawerOpen;
+                    StateHasChanged();
+                };
+            }
+
+
+
+            StateHasChanged();
+        }
+    }
+
+}

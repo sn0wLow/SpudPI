@@ -1,0 +1,42 @@
+::deep a:hover {
+    color: inherit;
+}
+
+::deep .mud-btn-background {
+    background-color: rgba(0,0,0,0.075) !important;
+    padding: 0.5rem !important;
+}
+
+    ::deep .mud-btn-background:hover {
+        background-color: rgba(0,0,0,0.1) !important;
+    }
+
+::deep .mud-main-content {
+    min-height: calc(100vh - 2rem);
+    min-height: calc(100lvh - 2rem);
+    height: calc(100vh - 2rem);
+    height: calc(100lvh - 2rem);
+    margin: 2rem 2rem 0rem 2rem;
+}
+
+::deep .mudblazor-text-info {
+    color: var(--mud-palette-info-text) !important;
+}
+
+::deep .mud-skeleton {
+    background-color: rgba(0,0,0,.21);
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+::deep .fade-in {
+    animation: fadeIn 1s ease-out;
+}

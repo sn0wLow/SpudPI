@@ -1,0 +1,95 @@
+﻿<MudPaper Elevation="3" Class="d-flex overflow-hidden" Style="height: 3.5rem;max-width: 100%">
+    <div Class="d-flex flex-wrap overflow-hidden" style="height: 3.5rem;">
+        @if (!Soundboards.Any())
+        {
+            <div class="d-flex">
+                <MudText Class="my-auto mx-5">No Soundboards Available</MudText>
+            </div>
+        }
+        else
+        {
+            @foreach (var soundboard in Soundboards.Where(sb => (!hideProSoundboards || !sb.ShowProLogo) && (!hideDefaultSoundboards || sb.IsCustom)))
+            {
+                var guid = soundboard.ID;
+                <SoundboardIcon ID="guid" Name="@soundboard.Name"
+                                IsPro="@soundboard.ShowProLogo" IsCustom="@soundboard.IsCustom"
+                                IsSelected="SelectedSoundboardGuid.Equals(guid)"
+                                OnIconClick="() => SelectSoundboard(guid)" />
+            }
+        }
+    </div>
+
+    <div class="d-flex align-items-center justify-content-center">
+
+        <MudMenu Icon="@Icons.Material.Filled.KeyboardArrowDown" Class="mud-menu-soundboard-config mx-1"
+                 Disabled="@(!Soundboards.Any())"
+                 AnchorOrigin="Origin.BottomRight" TransformOrigin="Origin.TopRight" MaxHeight="400">
+
+
+            @for (int i = 0, index = 0; i < Soundboards.Count; i++)
+            {
+                var soundboard = Soundboards[i];
+                if ((!hideProSoundboards || !soundboard.ShowProLogo) && (!hideDefaultSoundboards || soundboard.IsCustom))
+                {
+                    var guid = soundboard.ID!;
+                    var name = soundboard.Name!;
+                    <MudMenuItem Style="@(SelectedSoundboardGuid.Equals(guid) ? "color: white" : "")"
+                                 @onclick="() => SelectSoundboard(guid)">@name</MudMenuItem>
+                    if (index < Soundboards.Count(s => (!hideProSoundboards || !s.ShowProLogo) && (!hideDefaultSoundboards || s.IsCustom)) - 1)
+                    {
+                        <MudDivider />
+                    }
+                    index++;
+                }
+            }
+
+
+
+        </MudMenu>
+
+    </div>
+    <MudDivider Vertical="true" Class="mx-2 mt-1" Style="height: calc(100% - 0.5rem)" />
+
+    <MudMenu Icon="@Icons.Material.Filled.Build" Class="mud-menu-soundboard-config me-2"
+             AnchorOrigin="Origin.BottomRight" TransformOrigin="Origin.TopRight"
+             aria-label="configure sounboard">
+        <MudSwitch T="bool" Label="Hide Pro Soundboards" Disabled="@(!Soundboards.Any())"
+                   Color="Color.Info" Class="px-5" @bind-Value="@hideProSoundboards" />
+        <MudSwitch T="bool" Label="Hide default Soundboards" Disabled="@(!Soundboards.Any())"
+                   Color="Color.Info" Class="px-5" @bind-Value="@hideDefaultSoundboards" />
+    </MudMenu>
+</MudPaper>
+
+@code {
+
+    private bool hideProSoundboards = false;
+    private bool hideDefaultSoundboards = false;
+
+    [Parameter]
+    public List<Soundboard> Soundboards { get; set; } = new List<Soundboard>();
+
+    [Parameter]
+    public Guid? SelectedSoundboardGuid { get; set; } = null;
+
+    [Parameter]
+    public EventCallback<Guid?> SelectedSoundboardGuidChanged { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        if (SelectedSoundboardGuid == null && Soundboards.Any())
+        {
+            SelectSoundboard(Soundboards.First().ID);
+        }
+    }
+
+    private void SelectSoundboard(Guid guid)
+    {
+        SetSelectedSoundboardGuid(guid);
+    }
+
+    public void SetSelectedSoundboardGuid(Guid? value)
+    {
+        SelectedSoundboardGuid = value;
+        SelectedSoundboardGuidChanged.InvokeAsync(value);
+    }
+}
