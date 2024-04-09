@@ -7,5 +7,5 @@
 - Rebuild of the Voicemod UI using MudBlazor for some Components
 
 ---
-"Rebuilt" of the Voicemod UI
+"Rebuilt" of the Voicemod Soundboard UI
 ![ui example](https://i.imgur.com/AwXfwu7.png)
