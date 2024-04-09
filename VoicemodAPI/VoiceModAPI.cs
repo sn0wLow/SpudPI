@@ -219,7 +219,14 @@ namespace VoicemodAPI
                 DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
             };
 
-            return await GetResponse<GetBitmapRequest, GetBitmapResponse>(getBitmapResponse, jsonSerializerOptions);
+            var response = await GetResponse<GetBitmapRequest, GetBitmapResponse>(getBitmapResponse, jsonSerializerOptions);
+
+            if (response?.ActionObject?.MemeSoundBitmap is not null)
+            {
+                response.ActionObject.MemeSoundBitmap.MemeID = memeID;
+            }
+
+            return response;
         }
 
         public async Task<List<Soundboard>> GetAllSoundboards()
